@@ -1,0 +1,228 @@
+// {
+//     // See https://go.microsoft.com/fwlink/?LinkId=733558
+//     // for the documentation about the tasks.json format
+//     "version": "2.0.0",
+//     "tasks": [
+//         {
+//             "label": "echo",
+//             "type": "shell",
+//             "command": "echo Hello",
+//             "problemMatcher": [],
+//             "group": {
+//                 "kind": "build",
+//                 "isDefault": true
+//             }
+//         }
+//     ]
+// }
+
+
+
+{
+   "version": "2.0.0",
+   "tasks": [
+    {
+        "label": "java run",
+        "type": "shell",
+        "command": "gnome-terminal -- sh -c 'cd ${fileDirname}; java ${fileBasenameNoExtension} ; echo;echo ; echo \"Code run finished successfully. Press any key to exit...\"; read -n 1; exit;  exec bash'",
+        "presentation": {
+            "reveal": "silent",
+            "focus": false,
+            "clear": true
+        }
+    },
+    {
+        "label": "konsole java",
+        "type": "shell",
+        "windows":{
+            "command":"cd ${fileDirname} && javac ${file} && start \"SR Terminal\" cmd /k \"java ${fileBasenameNoExtension} & pause & exit\"",
+        },
+        "linux":{
+            "command": "cd ${fileDirname} && javac ${file} && gnome-terminal -- sh -c 'java ${fileBasenameNoExtension}; echo;echo ; echo \"Code run finished successfully. Press any key to exit...\"; read -n 1; exit;  exec bash'",
+        },
+        "presentation": {
+            "reveal": "silent",
+            "focus": false,
+            "clear": true
+        }
+    },
+    {
+        "label": "konsole java compile-run",
+        "type": "shell",
+        "command": "gnome-terminal -- sh -c 'cd ${fileDirname}; java ${file}; echo ; echo \"Code run finished successfully. Press any key to exit...\"; read -n 1; exit;  exec bash'",
+        "presentation": {
+            "reveal": "silent",
+            "focus": false,
+            "clear": true
+        }
+    },
+    {
+        "label": "java sublime",
+        "type": "shell",
+        "command": "cd ${fileDirname}; javac ${fileBasenameNoExtension}.java && java ${fileBasenameNoExtension} </mnt/Download/Documents/C++/input.txt> /mnt/Download/Documents/C++/output.txt"
+    },
+    {
+        "label": "java sublime just run",
+        "type": "shell",
+        "command": "cd ${fileDirname}; java ${fileBasenameNoExtension} </mnt/Download/Documents/C++/input.txt> /mnt/Download/Documents/C++/output.txt"
+    },
+    {
+        "label": "JC",
+        "command": "java",
+        "windows": {
+            "command": "C:\\Program Files\\Java\\jdk1.8.0_111\\bin\\javac.exe"
+        },
+        "args": [
+            "${file}"
+        ]
+    },
+    {
+        "label": "JR",
+        "command": "java",
+        "windows": {
+            "command": "C:\\Program Files\\Java\\jdk1.8.0_111\\bin\\java.exe"
+        },
+        "args": [
+            "-cp",
+            "${fileDirname}",
+            "${fileBasenameNoExtension}"
+        ]
+    },
+    {
+        "type": "typescript",
+        "tsconfig": "C++/Create Apps/mytask/tsconfig.json",
+        "problemMatcher": [
+            "$tsc"
+        ],
+        "group": "build",
+        "label": "tsc: build - C++/Create Apps/mytask/tsconfig.json"
+    },
+    {
+        "type": "cppbuild",
+        "label": "C/C++: g++ build active file",
+        "command": "/usr/bin/g++",
+        "args": [
+            "-fdiagnostics-color=always",
+            "-g",
+            "${file}",
+            "-o",
+            "${fileDirname}/${fileBasenameNoExtension}"
+        ],
+        "options": {
+            "cwd": "${fileDirname}"
+        },
+        "problemMatcher": [
+            "$gcc"
+        ],
+        "group": "build",
+        "detail": "compiler: /usr/bin/g++"
+    },
+    {
+        "type": "cppbuild",
+        "label": "C/C++: g++ build graph file",
+        "command": "cd",
+        "args": [
+            "${fileDirname}",
+            "&&",
+            "g++",
+            "-o",
+            "${fileBasenameNoExtension}",
+            "${file}",
+            "-lgraph",
+            "&&",
+            "./${fileBasenameNoExtension}"
+        ],
+        "options": {
+            "cwd": "${fileDirname}"
+        },
+        "problemMatcher": [
+            "$gcc"
+        ],
+        "group": "build",
+        "detail": "compiler: /usr/bin/g++"
+    },
+    {
+        "type": "cppbuild",
+        "label": "C/C++: g++ build active file",
+        "command": "/usr/bin/g++",
+        "args": [
+            "-fdiagnostics-color=always",
+            "-g",
+            "${file}",
+            "-o",
+            "${fileDirname}/${fileBasenameNoExtension}"
+        ],
+        "options": {
+            "cwd": "${fileDirname}"
+        },
+        "problemMatcher": [
+            "$gcc"
+        ],
+        "group": "build",
+        "detail": "compiler: /usr/bin/g++"
+    },
+    {
+        "label": "cf",
+        "type": "shell",
+        "command": "",
+        "args": [
+            "cd",
+            "${fileDirname}",
+            "&&",
+            "g++",
+            "${file}",
+            "-o",
+            "${fileBasenameNoExtension}",
+            "&&",
+            "./${fileBasenameNoExtension}",
+            "<",
+            "/mnt/Download/Documents/C++/input.txt",
+            ">",
+            "/mnt/Download/Documents/C++/output.txt"
+        ],
+        "group": {
+            "kind": "build",
+            "isDefault": true
+        },
+        "problemMatcher": {
+            "owner": "cpp",
+            "fileLocation": [
+                "relative",
+                "${workspaceRoot}"
+            ],
+            "pattern": {
+                "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+                "file": 1,
+                "line": 2,
+                "column": 3,
+                "severity": 4,
+                "message": 5
+            }
+        }
+    },
+    {
+        "type": "java",
+        "mainClass": "Test",
+        "targetPath": "${workspaceFolder}/${workspaceFolderBasename}.jar",
+        "elements": [
+            "${compileOutput}",
+            "${dependencies}"
+        ],
+        "problemMatcher": [],
+        "label": "java: exportjar:Documents"
+    },
+    {
+        "type": "java",
+        "mainClass": "Test",
+        "targetPath": "${workspaceFolder}/${workspaceFolderBasename}.jar",
+        "elements": [
+            "${compileOutput}",
+            "${dependencies}"
+        ],
+        "problemMatcher": [],
+        "label": "java: exportjar:Documents"
+    }
+]
+}
+    
+    
