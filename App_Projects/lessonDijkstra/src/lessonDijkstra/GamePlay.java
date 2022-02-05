@@ -1,4 +1,4 @@
-package lessonDijkstra;
+
 
 import java.awt.BasicStroke;
 import java.awt.Graphics;
