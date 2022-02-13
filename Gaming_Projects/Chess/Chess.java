@@ -81,39 +81,68 @@ public class Chess extends JFrame{
 
 
         board[r][c].check = 'c';
-        if(board[r][c].iconChar == king){wag++;voldemort*=board[r][c].iconSerial;}
+        if(board[r][c].iconChar == king){wag++;voldemort*=board[cur_row][cur_col].iconSerial;}
     }
 
     public void goYX(int r, int c, int i, int j, int num) {
-        if(board[r][c].iconChar <= 'Z')king='k';
-        else king='K';
+        if(whiteturn)king='K';
+        else king='k';
 
         char c1='x',c2='x';
-        int kr = r, kc = c;
-
-        for( ;c1=='x'; ){
+        int kr1, kc1, kr2, kc2;
+        int kr = cur_row, kc = cur_col;
+        kr1 = kr2 = kc1 = kc2 = -100;
+        for(;;){
             r+=i; c+=j;
-            if(r<1 || r>8 || c<1 || c>8)break;
-            c1 = board[r][c].iconChar;
-            board[r][c].check = 'c';
-            if(c1 == king){kr=r;kc=c;wag++;voldemort*=board[cur_row][cur_col].iconSerial;}
-            else if(c1 != 'x' && board[r][c].iconSerial%2 == board[cur_row][cur_col].iconSerial%2){
-                r=9; c=9;
+            if(r<1 || r>8 || c<1 || c>8){r-=i;c-=j;break;}
+            if(board[r][c].iconChar != 'x'){
+                if(c1 == 'x'){ c1 = board[r][c].iconChar; kr1 = r; kc1 = c; }
+                else { c2 = board[r][c].iconChar; kr2 = r; kc2 = c; break; }
             }
         }
-        for( ;c2=='x'; ){
-            r+=i; c+=j;
-            if(r<1 || r>8 || c<1 || c>8)break;
-            c2 = board[r][c].iconChar;
-            if(c1 == king) board[r][c].check = 'c';
-            else if(c2 == king){kr=r-i; kc=c-j;}
 
+        if(r == cur_row && c == cur_col)return;
+        if(kr1 == -100)kr1 = r;
+        if(kr2 == -100)kr2 = r;
+        if(kc1 == -100)kc1 = c;
+        if(kc2 == -100)kc2 = c;
+
+
+        for(int cr=cur_row+i, cc=cur_col+j; cr!=kr1 || cc!=kc1; cr+=i, cc+=j){
+            if(cr<1 || cr>8 || cc<1 || cc>8)break;
+            board[cr][cc].check = 'c';
         }
-        for( ; kr!=cur_row&&kc!=cur_col; kr-=i, kc-=j){
-            if(kr<1 || kr>8 || kc<1 || kc>8)continue;
-            if(board[kr][kc].members%board[cur_row][cur_col].iconSerial != 0)
-                board[kr][kc].members *= board[cur_row][cur_col].iconSerial;
+        if(c1!='x' && board[kr1][kc1].iconSerial%2==board[cur_row][cur_col].iconSerial%2){
+            board[kr1][kc1].check = 'c';
+            return;
         }
+
+        if(c2 == king){
+            for(int cr=cur_row+i, cc=cur_col+j; cr!=kr2 || cc!=kc2; cr+=i, cc+=j){
+                if(cr<1 || cr>8 || cc<1 || cc>8)break;
+                // print("ki ar bolbo\n");
+                board[cr][cc].members *= board[cur_row][cur_col].iconSerial;
+            }
+        }
+
+        if(c1 == king){  
+            for(int cr=cur_row, cc=cur_col; cr!=kr1 || cc!=kc1; cr+=i, cc+=j){
+                board[cr][cc].members *= board[cur_row][cur_col].iconSerial;
+            }
+            
+            for(int cr=kr1, cc=kc1; cr!=kr2+i || cc!=kc2+j; cr+=i, cc+=j){
+                if(cr<1 || cr>8 || cc<1 || cc>8)break;
+                board[cr][cc].check = 'c';
+            }
+
+            voldemort *= board[cur_row][cur_col].iconSerial;
+        }
+
+        // if(c1 == king || c2 == king){
+        //     print(cur_row + " " + cur_col + " " + kr1 + " " + kc1 + " " + kr2 + " " + kc2 + "\n\n");
+        // }
+
+
         
     }
 
@@ -231,7 +260,7 @@ public class Chess extends JFrame{
             }
         }
         
-        // drawBoard();
+        drawBoard();
     }
 
     public class LabelDragger implements MouseListener, MouseMotionListener {
@@ -273,7 +302,7 @@ public class Chess extends JFrame{
             newRow = getrowy(y); newCol = x/100;
             Boolean setToPrevPosition = false;
 
-            if(!isDragging || newRow <1 || newRow >= 8 || newCol <1 || newCol >8)setToPrevPosition = true;
+            if(!isDragging || newRow <1 || newRow > 8 || newCol <1 || newCol >8)setToPrevPosition = true;
             else if(board[newRow][newCol].members % board[prevRow][prevCol].iconSerial != 0)setToPrevPosition = true;
             else if(prevRow==newRow && prevCol==newCol)setToPrevPosition = true;
             if(setToPrevPosition){
@@ -296,6 +325,7 @@ public class Chess extends JFrame{
             }
 
             refreshBoard();
+            // drawBoard(); // comment
 
 
             if(totalMoves == 0) {
@@ -364,7 +394,8 @@ public class Chess extends JFrame{
 
 
     public class Rectangle{
-        int moves = 0, members = 1, iconSerial = 1, posx=1, posy = 1, row=1, col=1;
+        int moves = 0, posx=1, posy = 1, row=1, col=1;
+        long members = 1, iconSerial = 1;
         JLabel icon = null;
         char iconChar='x', check='x';
         int checkMembers=1;
@@ -399,7 +430,7 @@ public class Chess extends JFrame{
             }
             if(wag >= 2){moves=0;return;}
 
-            int res = voldemort*(members/iconSerial); //////// check if res = 0
+            long res = voldemort*(members/iconSerial); //////// check if res = 0
             if(res == 0){res=1;}
 
             if(iconChar == 'p' || iconChar == 'P' || iconChar == 'h' || iconChar == 'H'){
@@ -448,6 +479,7 @@ public class Chess extends JFrame{
             for(int j=1; j<=8; j++){
                 board[i][j].check = 'x';
                 board[i][j].moves = 0;
+                // if(board[i][j].check == 'x')
                 board[i][j].members = board[i][j].iconSerial;
             }
         }
@@ -489,6 +521,8 @@ public class Chess extends JFrame{
             }
             System.out.print("\n");
         }
+        print("\n\n"+wag);
+
         print("\n\n\n\n\n\n");
     }
 

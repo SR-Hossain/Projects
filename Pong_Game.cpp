@@ -208,9 +208,9 @@ public:
         int player1y = player1->gety();
         int player2y = player2->gety();
         int player2x = player2->getx();
-        if (_kbhit)
+        if (_kbhit())
         {
-            char current = _getch();
+            char current = getch();
             if (current == up1 and player1y > 0)
                 player1->moveup();
             else if (current == up2 and player2y > 0)

@@ -16,7 +16,7 @@ void draw()
     }
 }
 void valuechange(){
-    int k = _getch() - 48;
+    int k = getch() - 48;
     int r = ceil(k/3.);
     int p = k%3?k%3:3;
     if(visited[k]==0){
@@ -52,6 +52,7 @@ int main()
         draw();
         valuechange();
         score();
+        system("cls");
     }
     getch();
 }
