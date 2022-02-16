@@ -1,11 +1,12 @@
+import java.awt.Font;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.io.File;
 import java.util.Scanner;
 
-
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
@@ -15,8 +16,9 @@ public class Chess extends JFrame{
 
     private JLayeredPane content;
 
-    int[] prime = {3, 5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,97,101,103,107,109,113,127,131, 137};
+    int[] prime = {3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,97,101,103,107,109,113,127,131, 137};
     public String firstplayer = "black", initposStr;
+    public Boolean isButtonOn = false;
     public Rectangle[][] board = new Rectangle[10][10];
     public int focus = 20, prevRow, prevCol, newRow, newCol, whitemoves, blackmoves;
     public Boolean isDragging = false, whiteturn;
@@ -48,10 +50,14 @@ public class Chess extends JFrame{
         setDefaultCloseOperation( EXIT_ON_CLOSE );
         setRectangle();
 
+
+
         // Background
         if(firstplayer == "white")
-        bg = this.setJlabel(null, 0, "Resources/white.png", 0, 0);
-        else bg = this.setJlabel(null, 0, "Resources/black.png", 0, 0);
+        bg = this.setJlabel(null, 1, "Resources/white.png", 0, 0);
+        else bg = this.setJlabel(null, 1, "Resources/black.png", 0, 0);
+
+
 
         setVisible(true);
 
@@ -149,6 +155,7 @@ public class Chess extends JFrame{
 
 
     public void refreshBoard() {
+        pawnPromotion();
 
         eraseBoard();
 
@@ -266,6 +273,7 @@ public class Chess extends JFrame{
     public class LabelDragger implements MouseListener, MouseMotionListener {
 
         public void mousePressed(MouseEvent e) {
+            if(isButtonOn)return;
             // drawBoard();
             isDragging = true;
             JLabel label = (JLabel) e.getSource();
@@ -276,6 +284,7 @@ public class Chess extends JFrame{
             if(whiteturn && (board[prevRow][prevCol].iconChar>'Z'))isDragging = false;
         }
         public void mouseDragged(MouseEvent e) {
+            if(isButtonOn)return;
             JLabel label = (JLabel)e.getSource();
             int x = label.getX() + e.getX();
             int y = label.getY() + e.getY();
@@ -296,6 +305,7 @@ public class Chess extends JFrame{
 
         }
         public void mouseReleased(MouseEvent e) {
+            if(isButtonOn)return;
             JLabel label = (JLabel) e.getSource();
             content.setLayer(label, focus++);
             int x = label.getX() + e.getX(), y = label.getY() + e.getY();
@@ -341,7 +351,9 @@ public class Chess extends JFrame{
 
 
         public void mouseMoved(MouseEvent e) {}
-        public void mouseClicked(MouseEvent e) {}
+        public void mouseClicked(MouseEvent e) {
+            
+        }
         public void mouseEntered(MouseEvent e) {}
         public void mouseExited(MouseEvent e) {}
     
@@ -369,6 +381,7 @@ public class Chess extends JFrame{
 
     private class RefreshThread extends Thread { public void run() { content.revalidate(); content.repaint();  } }
 
+    JButton[] pawnPromotionArr = new JButton[4];
 
     public void setRectangle(){
         for(int i=1; i<=8; i++){
@@ -390,6 +403,14 @@ public class Chess extends JFrame{
             else board[y][x].iconSerial = board[y][x].members = prime[i/3];
 
         }
+
+        pawnPromotionArr[0] = getButton("Queen", 400, 300);
+        pawnPromotionArr[3] = getButton("Knight", 400, 400);
+        pawnPromotionArr[1] = getButton("Rook", 400, 500);
+        pawnPromotionArr[2] = getButton("Bishop", 400, 600);
+        for(int i=0; i<4; i++)
+            content.add(pawnPromotionArr[i]);
+
     }
 
 
@@ -526,6 +547,97 @@ public class Chess extends JFrame{
         print("\n\n\n\n\n\n");
     }
 
+    int bx, by;
+    public void pawnPromotion(){
+        // Boolean promoteBool = false;
+        for(int j=1; j<=8; j*=8){
+            for(int i=1; i<=8; i++){
+                if(board[j][i].iconChar =='p' || board[j][i].iconChar =='P'){
+                    isButtonOn = true;
+                    pawnPromotionLayer(focus+2);
+                    bx = i;
+                    by = j;
+                    j=9;
+                    break;
+                
+                }
+            }
+        }
+    }
+
+    public JButton getButton(String buttonStr, int x, int y){
+        JButton b = new JButton(buttonStr);
+        b.setOpaque(false);
+        b.setVisible(true);
+        b.setFocusPainted(false);
+        b.setFont(new Font("Arial", Font.BOLD, 50));
+        b.setBounds(x,y, 400, 100);
+        b.addMouseListener(new ButtonClicker());
+        return b;
+    }
+    public void pawnPromotionLayer(int k){
+        for(int i=0; i<4; i++){
+            content.setLayer(pawnPromotionArr[i], k);
+        }
+    }
+
+    public class ButtonClicker implements MouseListener{
+
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            isButtonOn = false;
+
+            JButton b = (JButton) e.getSource();
+            String bname = b.getText();
+
+            if(bname.equals("Queen")){
+                board[by][bx].iconChar = (board[by][bx].iconChar == 'p')? 'q':'Q';
+            }
+            else if(bname.equals("Rook")){
+                board[by][bx].iconChar = (board[by][bx].iconChar == 'p')? 'r':'R';
+            }
+            else if(bname.equals("Knight")){
+                board[by][bx].iconChar = (board[by][bx].iconChar == 'p')? 'h':'H';
+            }
+            else if(bname.equals("Bishop")){
+                board[by][bx].iconChar = (board[by][bx].iconChar == 'p')? 'b':'B';
+            }
+
+            content.remove(board[by][bx].icon);
+
+            board[by][bx].icon = setJlabel(null, focus, "Resources/ChessPieces/"+board[by][bx].iconChar+".png", board[by][bx].posx+10, board[by][bx].posy+10);
+
+
+
+            pawnPromotionLayer(0);
+            
+        }
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+            // TODO Auto-generated method stub
+            
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            // TODO Auto-generated method stub
+            
+        }
+
+        @Override
+        public void mouseEntered(MouseEvent e) {
+            // TODO Auto-generated method stub
+            
+        }
+
+        @Override
+        public void mouseExited(MouseEvent e) {
+            // TODO Auto-generated method stub
+            
+        }
+
+    }
 
 
 
