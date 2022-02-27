@@ -1,3 +1,4 @@
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -7,17 +8,17 @@ import java.util.Scanner;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.SwingUtilities;
 
-public class Chess extends JFrame{
+public class Chess extends JLayeredPane{
 
-    private JLayeredPane content;
+    // JLayeredPane content;
+    // content = (JLayeredPane) getContentPane();
 
     int[] prime = {3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,97,101,103,107,109,113,127,131, 137};
-    public String firstplayer = "black", initposStr;
+    public String firstplayer = "white", initposStr;
     public Boolean isButtonOn = false;
     public Rectangle[][] board = new Rectangle[10][10];
     public int focus = 20, prevRow, prevCol, newRow, newCol, whitemoves, blackmoves;
@@ -25,6 +26,7 @@ public class Chess extends JFrame{
     int cur_row; int cur_col, wag = 0, totalMoves = 0, voldemort = 1;
     public char king = 'K';
     JLabel bg;
+    JLayeredPane mainmenuPane;
 
     public void takeString(){
         try{
@@ -34,20 +36,25 @@ public class Chess extends JFrame{
     }
 
 
-    public static void main(String[] args) {
-        new Chess();
-    }
+    // public static void main(String[] args) {
+    //     new Chess();
+    // }
     public Chess() {
-        super( "Chess" );
+        // super();
+        // super( "Chess" );
+        // content = getLayeredPaneAbove(c);
         takeString();
-        firstplayer = "black";
+        firstplayer = "white";
         whitemoves = blackmoves = 0;
         whiteturn = true;
-        content = new JLayeredPane();
-        content.setOpaque( true );
-        setContentPane( content );
+        // content = new JLayeredPane();
+        setOpaque( true );
+        
+        // setContentPane( content );
         setSize( 1500, 1000 );
-        setDefaultCloseOperation( EXIT_ON_CLOSE );
+        // add(content);
+        // setSize( 1500, 1000 );
+        // setDefaultCloseOperation( EXIT_ON_CLOSE );
         setRectangle();
 
 
@@ -96,7 +103,6 @@ public class Chess extends JFrame{
 
         char c1='x',c2='x';
         int kr1, kc1, kr2, kc2;
-        int kr = cur_row, kc = cur_col;
         kr1 = kr2 = kc1 = kc2 = -100;
         for(;;){
             r+=i; c+=j;
@@ -126,7 +132,6 @@ public class Chess extends JFrame{
         if(c2 == king){
             for(int cr=cur_row+i, cc=cur_col+j; cr!=kr2 || cc!=kc2; cr+=i, cc+=j){
                 if(cr<1 || cr>8 || cc<1 || cc>8)break;
-                // print("ki ar bolbo\n");
                 board[cr][cc].members *= board[cur_row][cur_col].iconSerial;
             }
         }
@@ -144,9 +149,6 @@ public class Chess extends JFrame{
             voldemort *= board[cur_row][cur_col].iconSerial;
         }
 
-        // if(c1 == king || c2 == king){
-        //     print(cur_row + " " + cur_col + " " + kr1 + " " + kc1 + " " + kr2 + " " + kc2 + "\n\n");
-        // }
 
 
         
@@ -160,14 +162,6 @@ public class Chess extends JFrame{
         eraseBoard();
 
 
-        // board[5][8].iconChar = 'b'; board[5][8].iconSerial = board[5][8].members = 86;
-        // board[2][5].iconChar = 'x'; board[2][5].iconSerial = board[2][5].members = 1;
-        // board[3][6].iconChar = 'P'; board[3][6].iconSerial = board[3][6].members = 71;
-        // // board[1][4].iconChar = 'x'; board[1][4].iconSerial = board[1][4].members = 1;
-        // // board[5][8].iconSerial = 86;
-        
-
-        // whose turn is not now, we should see where they can check the king
         for(cur_row = 1; cur_row<=8; cur_row++) {
             for(cur_col = 1; cur_col<=8; cur_col++) {
 
@@ -267,7 +261,7 @@ public class Chess extends JFrame{
             }
         }
         
-        drawBoard();
+        // drawBoard();
     }
 
     public class LabelDragger implements MouseListener, MouseMotionListener {
@@ -277,7 +271,7 @@ public class Chess extends JFrame{
             // drawBoard();
             isDragging = true;
             JLabel label = (JLabel) e.getSource();
-            content.setLayer(label, ++focus);
+            setLayer(label, ++focus);
             int x = label.getX() + e.getX(), y = label.getY() + e.getY();
             prevRow = getrowy(y); prevCol = x/100;
             if(board[prevRow][prevCol].moves == 0)isDragging = false;
@@ -307,7 +301,7 @@ public class Chess extends JFrame{
         public void mouseReleased(MouseEvent e) {
             if(isButtonOn)return;
             JLabel label = (JLabel) e.getSource();
-            content.setLayer(label, focus++);
+            setLayer(label, focus++);
             int x = label.getX() + e.getX(), y = label.getY() + e.getY();
             newRow = getrowy(y); newCol = x/100;
             Boolean setToPrevPosition = false;
@@ -320,8 +314,8 @@ public class Chess extends JFrame{
             }
             else{
                 if(board[newRow][newCol].icon != null)
-                    content.remove(board[newRow][newCol].icon);
-                content.setLayer(label, --focus);
+                    remove(board[newRow][newCol].icon);
+                setLayer(label, --focus);
                 board[newRow][newCol].icon = board[prevRow][prevCol].icon;
                 board[newRow][newCol].iconChar = board[prevRow][prevCol].iconChar;
                 board[newRow][newCol].iconSerial = board[prevRow][prevCol].iconSerial;
@@ -337,11 +331,22 @@ public class Chess extends JFrame{
             refreshBoard();
             // drawBoard(); // comment
 
-
             if(totalMoves == 0) {
+                JLabel winner;
                 if(whiteturn) 
-                {print("Black wins!!!!!!!!!!!!!!!\n\n");}
-                else {print("White wins!!!!!!!!!!!!\n\n");}
+                {
+                    winner = new JLabel("Black wins!\n\n");                    
+                }
+                else {
+                    winner = new JLabel("White wins!\n\n");
+                }
+                winner.setFont(new Font("Serif", Font.ITALIC, 60));
+                winner.setForeground(Color.RED);
+                winner.setBounds(1000, 500, 400, 700);
+                setLayer(winner, ++focus);
+                add(winner);
+                getRootPane().setContentPane(new MainMenu());
+
             }
 
 
@@ -370,16 +375,16 @@ public class Chess extends JFrame{
             }
 
         label.setOpaque( false );
-        content.setLayer( label, pos );
+        setLayer( label, pos );
 
-        getContentPane().add( label );
+        add( label );
 
         return label;
     }
  
     public int getrowy(int y){ if(firstplayer == "black")return y/100; else return 9-y/100; }
 
-    private class RefreshThread extends Thread { public void run() { content.revalidate(); content.repaint();  } }
+    private class RefreshThread extends Thread { public void run() { revalidate(); repaint();  } }
 
     JButton[] pawnPromotionArr = new JButton[4];
 
@@ -409,7 +414,7 @@ public class Chess extends JFrame{
         pawnPromotionArr[1] = getButton("Rook", 400, 500);
         pawnPromotionArr[2] = getButton("Bishop", 400, 600);
         for(int i=0; i<4; i++)
-            content.add(pawnPromotionArr[i]);
+            add(pawnPromotionArr[i]);
 
     }
 
@@ -577,13 +582,12 @@ public class Chess extends JFrame{
     }
     public void pawnPromotionLayer(int k){
         for(int i=0; i<4; i++){
-            content.setLayer(pawnPromotionArr[i], k);
+            setLayer(pawnPromotionArr[i], k);
         }
     }
 
     public class ButtonClicker implements MouseListener{
 
-        @Override
         public void mouseClicked(MouseEvent e) {
             isButtonOn = false;
 
@@ -603,7 +607,7 @@ public class Chess extends JFrame{
                 board[by][bx].iconChar = (board[by][bx].iconChar == 'p')? 'b':'B';
             }
 
-            content.remove(board[by][bx].icon);
+            remove(board[by][bx].icon);
 
             board[by][bx].icon = setJlabel(null, focus, "Resources/ChessPieces/"+board[by][bx].iconChar+".png", board[by][bx].posx+10, board[by][bx].posy+10);
 
@@ -613,29 +617,10 @@ public class Chess extends JFrame{
             
         }
 
-        @Override
-        public void mousePressed(MouseEvent e) {
-            // TODO Auto-generated method stub
-            
-        }
-
-        @Override
-        public void mouseReleased(MouseEvent e) {
-            // TODO Auto-generated method stub
-            
-        }
-
-        @Override
-        public void mouseEntered(MouseEvent e) {
-            // TODO Auto-generated method stub
-            
-        }
-
-        @Override
-        public void mouseExited(MouseEvent e) {
-            // TODO Auto-generated method stub
-            
-        }
+        public void mousePressed(MouseEvent e) { } 
+        public void mouseReleased(MouseEvent e) { } 
+        public void mouseEntered(MouseEvent e) { } 
+        public void mouseExited(MouseEvent e) { }
 
     }
 
