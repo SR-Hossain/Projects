@@ -1,0 +1,30 @@
+\data\
+ngram 1=17
+
+
+
+
+
+
+
+\1-grams:
+-1.0000 </s> -0.3010
+-1.0000 <s> -0.2553
+-1.0000 turnoff
+-1.0000 google
+-1.0000 youtube
+-1.0000 facebook
+-1.0000 twitter
+-1.0000 back
+-1.0000 forward
+-1.0000 left
+-1.0000 right
+-1.0000 close
+-1.0000 exit
+-1.0000 newtab
+-1.0000 reload
+-1.0000 refresh
+-1.0000 enter
+
+
+\end\

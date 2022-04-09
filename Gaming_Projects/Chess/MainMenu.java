@@ -23,7 +23,7 @@ public class MainMenu extends JLayeredPane {
         return label;
     }
     public MainMenu() {
-        setSize( 1500, 1000 );
+        setSize( 2000, 2000 );
         setJlabel(null, 0, "Resources/Background.png", 0, 0);
         getButton("New Game", 100, 300);
         getButton("Exit", 100, 500);

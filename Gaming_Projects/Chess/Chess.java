@@ -36,9 +36,6 @@ public class Chess extends JLayeredPane{
     }
 
 
-    // public static void main(String[] args) {
-    //     new Chess();
-    // }
     public Chess() {
         // super();
         // super( "Chess" );
@@ -332,21 +329,7 @@ public class Chess extends JLayeredPane{
             // drawBoard(); // comment
 
             if(totalMoves == 0) {
-                JLabel winner;
-                if(whiteturn) 
-                {
-                    winner = new JLabel("Black wins!\n\n");                    
-                }
-                else {
-                    winner = new JLabel("White wins!\n\n");
-                }
-                winner.setFont(new Font("Serif", Font.ITALIC, 60));
-                winner.setForeground(Color.RED);
-                winner.setBounds(1000, 500, 400, 700);
-                setLayer(winner, ++focus);
-                add(winner);
-                getRootPane().setContentPane(new MainMenu());
-
+                endTheGame();
             }
 
 
@@ -362,6 +345,26 @@ public class Chess extends JLayeredPane{
         public void mouseEntered(MouseEvent e) {}
         public void mouseExited(MouseEvent e) {}
     
+    }
+
+    public void endTheGame() {
+        JLabel winner;
+        if(whiteturn) 
+        {
+            winner = new JLabel("Black wins!\n\n");                    
+        }
+        else {
+            winner = new JLabel("White wins!\n\n");
+        }
+        winner.setFont(new Font("Serif", Font.ITALIC, 50));
+        winner.setForeground(Color.BLACK);
+        winner.setBounds(1060, 750, winner.getPreferredSize().width, winner.getPreferredSize().height );
+        setLayer(winner, ++focus);
+
+        add(winner);
+
+        setLayer(getButton("New Game", 1000, 850), ++focus);
+        setLayer(getButton("Exit", 1200, 850), ++focus);
     }
 
     public JLabel setJlabel( JLabel label, int pos, String str, int posX, int posY) {
@@ -413,8 +416,8 @@ public class Chess extends JLayeredPane{
         pawnPromotionArr[3] = getButton("Knight", 400, 400);
         pawnPromotionArr[1] = getButton("Rook", 400, 500);
         pawnPromotionArr[2] = getButton("Bishop", 400, 600);
-        for(int i=0; i<4; i++)
-            add(pawnPromotionArr[i]);
+        // for(int i=0; i<4; i++)
+        //     add(pawnPromotionArr[i]);
 
     }
 
@@ -576,8 +579,14 @@ public class Chess extends JLayeredPane{
         b.setVisible(true);
         b.setFocusPainted(false);
         b.setFont(new Font("Arial", Font.BOLD, 50));
-        b.setBounds(x,y, 400, 100);
+        if(buttonStr == "New Game" || buttonStr == "Exit"){
+            b.setFont(new Font("Arial", Font.BOLD, 30));
+            b.setBounds(x,y,200,50);
+        }
+        else
+            b.setBounds(x,y, 400, 100);
         b.addMouseListener(new ButtonClicker());
+        add(b);
         return b;
     }
     public void pawnPromotionLayer(int k){
@@ -605,6 +614,15 @@ public class Chess extends JLayeredPane{
             }
             else if(bname.equals("Bishop")){
                 board[by][bx].iconChar = (board[by][bx].iconChar == 'p')? 'b':'B';
+            }
+
+            else if(bname.equals("New Game")){
+                // setVisible(false);
+                getRootPane().setContentPane(new MainMenu());
+                return;
+            }
+            else if(bname.equals("Exit")){
+                System.exit(0);
             }
 
             remove(board[by][bx].icon);
